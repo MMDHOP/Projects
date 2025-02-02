@@ -4,6 +4,12 @@
 #include <cstdlib>
 using namespace std;
 
+// ساختار برای ذخیره مختصات (ردیف و ستون)
+struct Position
+{
+    int row, col; // مختصات در ماتریس
+};
+
 int main()
 {
     const int ROWS = 10;
@@ -95,7 +101,7 @@ int main()
     bool visited[ROWS][COLS] = {false};
 
     // آرایه والد برای بازسازی مسیر
-    pair<int, int> parent[ROWS][COLS];
+    Position parent[ROWS][COLS]; // جایگزین pair<int, int>
 
     // گرفتن مختصات شروع و پایان
     int startRow, startCol, endRow, endCol;
@@ -158,13 +164,13 @@ int main()
     else
     {
         // بازسازی مسیر
-        int path[ROWS * COLS][2]; // مسیر به صورت آرایه‌ای
+        Position path[ROWS * COLS]; // مسیر به صورت آرایه‌ای
         int pathLength = 0;
 
-        for (pair<int, int> at = {endRow, endCol}; at != make_pair(-1, -1); at = parent[at.first][at.second])
+        // بازسازی مسیر از انتها به ابتدا
+        for (Position at = {endRow, endCol}; at.row != -1; at = parent[at.row][at.col])
         {
-            path[pathLength][0] = at.first;
-            path[pathLength][1] = at.second;
+            path[pathLength] = at;
             pathLength++;
         }
 
@@ -172,7 +178,7 @@ int main()
         cout << "Path from start to end:\n";
         for (int i = pathLength - 1; i >= 0; i--)
         {
-            cout << "(" << path[i][0] << ", " << path[i][1] << ")";
+            cout << "(" << path[i].row << ", " << path[i].col << ")";
             if (i > 0)
                 cout << " -> ";
         }
@@ -186,7 +192,7 @@ int main()
                 bool isInPath = false;
                 for (int k = 0; k < pathLength; k++)
                 {
-                    if (path[k][0] == i && path[k][1] == j)
+                    if (path[k].row == i && path[k].col == j)
                     {
                         isInPath = true;
                         break;
