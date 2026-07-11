@@ -1,0 +1,1 @@
+visualize_gate("AND", input_a=False, input_b=False) # خروجی 0

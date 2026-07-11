@@ -26,6 +26,26 @@ MULTI_COLOR_RULES = {
     3: (0, "L"),
 }
 
+# MULTI_COLOR_RULES = {
+#     0: (1, "L"),
+#     1: (2, "L"),
+#     2: (3, "R"),
+#     3: (0, "R"),
+# }
+
+# MULTI_COLOR_RULES = {
+#     0: (1, "L"),
+#     1: (2, "R"),
+#     2: (3, "R"),
+#     3: (4, "R"),
+#     4: (5, "R"),
+#     5: (6, "R"),
+#     6: (7, "L"),
+#     7: (8, "L"),
+#     8: (0, "R"),
+# }
+
+
 PALETTE = [
     (0, 0, 0),
     (240, 240, 240),
@@ -68,6 +88,9 @@ def build_surface(grid, cell_scale, ant_position=None, ant_color=(220, 40, 40)):
 def run_visualizer(ant, cell_scale=6, fps=60, max_steps=None, title="Langton's Ant"):
     """Run the pygame event loop for a Langton's Ant simulation."""
     pygame.init()
+    
+    # استفاده از فونت سیستم (None یعنی فونت پیش‌فرض)
+    font = pygame.font.Font(None, 36)
 
     grid = ant.get_states()
     screen = pygame.display.set_mode((grid.shape[1] * cell_scale, grid.shape[0] * cell_scale))
@@ -75,20 +98,31 @@ def run_visualizer(ant, cell_scale=6, fps=60, max_steps=None, title="Langton's A
     clock = pygame.time.Clock()
 
     finished = False
-    steps = 0
     while not finished:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 finished = True
 
+        # ۱. رسم شبکه (پایه)
         surface = build_surface(grid, cell_scale, ant_position=ant.get_current_position())
         screen.blit(surface, (0, 0))
+        
+        # ۲. رسم پس‌زمینه مشکی برای متن (برای اینکه متن در هر شرایطی خوانا باشد)
+        pygame.draw.rect(screen, (0, 0, 0), (5, 5, 150, 40))
+        
+        # ۳. رندر کردن متن
+        step_text = font.render(f"Steps: {ant.steps_count}", True, (255, 255, 255))
+        
+        # ۴. چسباندن متن روی صفحه (این باید آخرین مرحله باشد)
+        screen.blit(step_text, (10, 500))
+        
+        # ۵. نمایش همه چیز در صفحه
         pygame.display.flip()
 
         ant.step()
         grid = ant.get_states()
-        steps += 1
-        if max_steps is not None and steps >= max_steps:
+        
+        if max_steps is not None and ant.steps_count >= max_steps:
             finished = True
 
         clock.tick(fps)
